@@ -1,0 +1,24 @@
+---
+title: "Lieve_Debugs"
+author: "Lieve Verschelde & Marijke Thoonen"
+date: "2025-03-17"
+output: html_document
+---
+## Load packages
+
+```{r packages, include=FALSE}
+library(lubridate)
+library(dplyr)
+library(tidyverse)
+```
+
+## Set working directory
+
+Sets the working directory in R to the folder containing the currently active script
+
+```{r working directory}
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+```
+
+## Load raw data
+
