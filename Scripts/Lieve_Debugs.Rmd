@@ -21,9 +21,11 @@ Sets the working directory in R to the folder containing the currently active sc
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 ```
 
-## Load raw data and view it
+## Load raw data
 ```{r}
-groundbeetle.data <- read_sheet("https://docs.google.com/spreadsheets/d/1uJ7rvQBkw0_-e2dsiBlX2NJcrCcfEFqC-ZvEV0RwNVg/edit?gid=0#gid=0", col_names = FALSE) # geen hoofding/kolomnamen
+sheet_url <- "https://docs.google.com/spreadsheets/d/1uJ7rvQBkw0_-e2dsiBlX2NJcrCcfEFqC-ZvEV0RwNVg/edit"
+groundbeetle.data <- read_sheet(sheet_url, col_names = FALSE)
+
 ```
 
 ## Edit and finetune raw dataset
@@ -31,14 +33,14 @@ groundbeetle.data <- read_sheet("https://docs.google.com/spreadsheets/d/1uJ7rvQB
 groundbeetle.data <- groundbeetle.data %>% slice(-1) # eerste rij verwijderen
 groundbeetle.data <- groundbeetle.data %>% row_to_names(row_number = 1) # eerste rij als kolomnamen
 
+
 groundbeetle.data$Ophaaldatum <- ymd(groundbeetle.data$Ophaaldatum) # kolom om naar een datumtype
 # 2 datums zijn gefaald (regel 136 (dag ontbreekt), 224 (staal zonder label))
 
-sapply(groundbeetle.data, class) # variabel klasse/type?
+groundbeetle.data <- as.data.frame(groundbeetle.data)
 
-
-view(groundbeetle.data) # Bekijk resultaat
-str(groundbeetle.data)
+# Bekijk de data
+View(groundbeetle.data)
 ```
 
 ## Convert datatypes 
