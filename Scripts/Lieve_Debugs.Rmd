@@ -66,14 +66,21 @@ list_columns <- sapply(groundbeetle.data, is.list)
 groundbeetle.data[, list_columns] <- lapply(groundbeetle.data[, list_columns], function(column) {
   # Convert NULL to NA
   column <- sapply(column, function(x) if (is.null(x)) NA else x)
-  
   # Apply conversion to numeric
-  as.numeric(unlist(column))
+  column <- as.numeric(unlist(column))
 })
+
+# select species columns
+species_columns <- names(groundbeetle.data)[sapply(groundbeetle.data, is.numeric)]
+
+# replace all NA with 0 in species columns
+groundbeetle.data <- groundbeetle.data %>%
+  mutate(across(all_of(species_columns), ~ ifelse(is.na(.), 0, .)))
+
 
 ## View datatype after conversion
 sapply(groundbeetle.data, class)
-
+View(groundbeetle.data)
 ```
 
 # Link traitlist with groundbeetle dataset
