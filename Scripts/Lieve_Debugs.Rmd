@@ -11,8 +11,12 @@ output: html_document
 library(lubridate)
 library(dplyr)
 library(tidyverse)
-library(googlesheets4) # om google sheet in te laden
-library(janitor)  # voor colomnames
+
+# to load google sheet
+library(googlesheets4) 
+
+# to name columns
+library(janitor)  
 ```
 
 ## Set working directory
@@ -30,22 +34,50 @@ groundbeetle.data <- read_sheet(sheet_url, col_names = FALSE)
 
 ## Edit and finetune raw dataset
 ```{r}
-groundbeetle.data <- groundbeetle.data %>% slice(-1) # eerste rij verwijderen
-groundbeetle.data <- groundbeetle.data %>% row_to_names(row_number = 1) # eerste rij als kolomnamen
+# remove first row
+groundbeetle.data <- groundbeetle.data %>% slice(-1) 
+# make first row header
+groundbeetle.data <- groundbeetle.data %>% row_to_names(row_number = 1)
 
+# convert column dates to date type
+groundbeetle.data$Ophaaldatum <- ymd(groundbeetle.data$Ophaaldatum) 
+  # 1 date failed, sample without label
 
-groundbeetle.data$Ophaaldatum <- ymd(groundbeetle.data$Ophaaldatum) # kolom om naar een datumtype
-# 2 datums zijn gefaald (regel 136 (dag ontbreekt), 224 (staal zonder label))
+# convert data to a data set, easier to make models
+groundbeetle.data <- as.data.frame(groundbeetle.data) 
 
-groundbeetle.data <- as.data.frame(groundbeetle.data)
-
-# Bekijk de data
+# View dataset
 View(groundbeetle.data)
 ```
 
 ## Convert datatypes 
 ```{r}
-# Omzetten van Staalnummer (list) naar character
+# convert column of sample numbers to character
 groundbeetle.data$Staalnummer <- as.character(groundbeetle.data$Staalnummer)
+
+
+# View datatypes of dataset
+glimpse(groundbeetle.data)
+
+# Identify remainder columns with 'list' type (all species)
+list_columns <- sapply(groundbeetle.data, is.list)
+
+# Conversion
+groundbeetle.data[, list_columns] <- lapply(groundbeetle.data[, list_columns], function(column) {
+  # Convert NULL to NA
+  column <- sapply(column, function(x) if (is.null(x)) NA else x)
+  
+  # Apply conversion to numeric
+  as.numeric(unlist(column))
+})
+
+## View datatype after conversion
+sapply(groundbeetle.data, class)
+
+```
+
+# Link traitlist with groundbeetle dataset
+```{r}
+
 ```
 
