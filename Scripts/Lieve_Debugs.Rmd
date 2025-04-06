@@ -6,7 +6,9 @@ output: html_document
 ---
 
 ## Load required packages
+
 ### With the library googlesheets4, Rstudio has access to the dataset
+
 ```{r packages, include=FALSE}
 library(lubridate)
 library(dplyr)
@@ -20,12 +22,15 @@ library(janitor)
 ```
 
 ## Set working directory
+
 Sets the working directory in R to the folder containing the currently active script
+
 ```{r working directory}
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 ```
 
 ## Load raw data
+
 ```{r}
 sheet_url <- "https://docs.google.com/spreadsheets/d/1uJ7rvQBkw0_-e2dsiBlX2NJcrCcfEFqC-ZvEV0RwNVg/edit"
 groundbeetle.data <- read_sheet(sheet_url, col_names = FALSE)
@@ -33,6 +38,7 @@ groundbeetle.data <- read_sheet(sheet_url, col_names = FALSE)
 ```
 
 ## Edit and finetune raw dataset
+
 ```{r}
 # remove first row
 groundbeetle.data <- groundbeetle.data %>% slice(-1) 
@@ -50,7 +56,8 @@ groundbeetle.data <- as.data.frame(groundbeetle.data)
 View(groundbeetle.data)
 ```
 
-## Convert datatypes 
+## Convert datatypes
+
 ```{r}
 # convert column of sample numbers to character
 groundbeetle.data$Staalnummer <- as.character(groundbeetle.data$Staalnummer)
@@ -87,4 +94,3 @@ View(groundbeetle.data)
 ```{r}
 
 ```
-
