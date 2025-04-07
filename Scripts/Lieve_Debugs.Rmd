@@ -90,7 +90,22 @@ sapply(groundbeetle.data, class)
 View(groundbeetle.data)
 ```
 
-# Link traitlist with groundbeetle dataset
+# Link traitlists
 ```{r}
+# Load txt files
+species_taxon_path <- "C:/Users/lieve/OneDrive/Documenten/Academiejaar_2024_2025/thesis/Data_analyse/Github/Thesis_Lieve/Data_raw/Arthropoda_Traits_Logghe/taxon.txt"
+species_habitats_path <- "C:/Users/lieve/OneDrive/Documenten/Academiejaar_2024_2025/thesis/Data_analyse/Github/Thesis_Lieve/Data_raw/Arthropoda_Traits_Logghe/description.txt"
+species_measurements_path <- "C:/Users/lieve/OneDrive/Documenten/Academiejaar_2024_2025/thesis/Data_analyse/Github/Thesis_Lieve/Data_raw/Arthropoda_Traits_Logghe/measurementorfacts.txt"
+
+species_taxon <- read.table(species_taxon_path, header = TRUE, sep = "\t")
+species_habitat <- read.table(species_habitats_path, header = TRUE, sep = "\t" )
+species_measurements <- read.table(species_measurements_path, header = TRUE, sep = "\t" )
+
+glimpse(species_taxon)
+glimpse(species_habitat)
+glimpse(species_measurements)
+
+
+
 
 ```
