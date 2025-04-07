@@ -107,8 +107,7 @@ view(species_habitat)
 view(species_measurements)
 ```
 
-# filter datasets (Logghe)
-
+# filter datasets (Logghe), compose traitlist dataset
 ```{r}
 # Get groundbeetle species from data set (column (5-58))
 groundbeetle_species <- colnames(groundbeetle.data)[5:58]
@@ -128,7 +127,19 @@ identical(groundbeetle_taxon$id, groundbeetle_taxon$taxonID)
 groundbeetle_taxon$taxonID <- NULL
 view(groundbeetle_taxon)
 
+species_measurements_sorted <- species_measurements %>%
+  pivot_wider(
+    names_from = measurementType, 
+    values_from = c(measurementValue, measurementUnit)
+  )
+View(species_measurements_sorted)
 
+# merge taxon and measurements in one dataset
+traitlist_result <- merge(groundbeetle_taxon, species_measurements_sorted, by = "id")
+view(traitlist_result)
 
+# check dataset types
+glimpse(groundbeetle_taxon)
+glimpse(traitlist_result)
 
 ```
