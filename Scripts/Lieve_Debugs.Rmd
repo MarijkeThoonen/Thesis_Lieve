@@ -90,7 +90,7 @@ sapply(groundbeetle.data, class)
 View(groundbeetle.data)
 ```
 
-# Link traitlists
+# Upload traitlists
 
 ```{r}
 # Load txt files
@@ -107,7 +107,7 @@ view(species_habitat)
 view(species_measurements)
 ```
 
-# filter datasets (Logghe), compose traitlist dataset
+# Filter datasets (Logghe), compose traitlist dataset
 ```{r}
 # Get groundbeetle species from data set (column (5-58))
 groundbeetle_species <- colnames(groundbeetle.data)[5:58]
@@ -130,8 +130,7 @@ view(groundbeetle_taxon)
 species_measurements_sorted <- species_measurements %>%
   pivot_wider(
     names_from = measurementType, 
-    values_from = c(measurementValue, measurementUnit)
-  )
+    values_from = c(measurementValue, measurementUnit))
 View(species_measurements_sorted)
 
 # merge taxon and measurements in one dataset
@@ -141,5 +140,40 @@ view(traitlist_result)
 # check dataset types
 glimpse(groundbeetle_taxon)
 glimpse(traitlist_result)
+```
+Now let's create 1 large data set that shows per pitfall trap and per location the species captured (from Marijke Thoonen) with its measurements (from Garben Logghe)
+```{r}
+groundbeetles_pitfall <- groundbeetle.data %>%
+  pivot_longer(
+    cols = 5:58,             # Neem alle kolommen met soorten (voorlopig 5-58)!
+    names_to = "scientificName",  # Zet kolomnamen (de soortnamen) om naar waarden in de kolom 'scientificName'
+    values_to = "Aantal"          # De bijbehorende aantallen komen in een nieuwe kolom 'Aantal'
+  ) %>%
+  filter(Aantal != 0)
+
+groundbeetles_pitfall$opmerking <- NULL
+groundbeetles_pitfall$`rest, aftrekken van totale aantal loopkevers` <- NULL
+groundbeetles_pitfall$determinator <- NULL
+
+view(groundbeetles_pitfall)
+
+# adding the traitlist
+groundbeetles_community <- groundbeetles_pitfall %>%
+  left_join(traitlist_result, by = "scientificName")
+
+# view meta data
+view(groundbeetles_community)
+```
+
+
+# Edit species habitat
+```{r}
+# remove language and habitats where species does not occur
+species_habitat$language <- NULL
+species_habitat <- species_habitat %>%
+  filter(description != "0")
+view(species_habitat)
+
 
 ```
+
