@@ -34,7 +34,6 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 ```{r}
 sheet_url <- "https://docs.google.com/spreadsheets/d/1uJ7rvQBkw0_-e2dsiBlX2NJcrCcfEFqC-ZvEV0RwNVg/edit"
 groundbeetle.data <- read_sheet(sheet_url, col_names = FALSE)
-
 ```
 
 ## Edit and finetune raw dataset
@@ -158,22 +157,36 @@ groundbeetles_pitfall$determinator <- NULL
 view(groundbeetles_pitfall)
 
 # adding the traitlist
-groundbeetles_community <- groundbeetles_pitfall %>%
+groundbeetle_community <- groundbeetles_pitfall %>%
   left_join(traitlist_result, by = "scientificName")
 
 # view meta data
-view(groundbeetles_community)
+view(groundbeetle_community)
 ```
 
 
 # Edit species habitat
 ```{r}
-# remove language and habitats where species does not occur
-species_habitat$language <- NULL
+# remove rows with description value 0
 species_habitat <- species_habitat %>%
   filter(description != "0")
+
+# remove language column
+species_habitat$language <- NULL
 view(species_habitat)
 
+# remove id's that are not present in the groundbeeltes_community
+species_habitat_filtered <- species_habitat %>%
+  semi_join(groundbeetle_community, by = "id")
+glimpse(species_habitat)
+
+species_habitat_breed <- species_habitat %>%
+  filter(description != "0") %>%           # Eerst: verwijder "0"-waardes
+  pivot_wider(
+    names_from = type,                     # Maak van de 'type'-waarden kolomnamen
+    values_from = description,             # Vul de kolommen met 'description'
+    values_fn = list(description = ~ first(.))  # In geval van meerdere, neem de eerste
+  )
 
 ```
 
