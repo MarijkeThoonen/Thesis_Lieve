@@ -194,24 +194,34 @@ view(groundbeetle_habitat)
 #glimpse(groundbeetle_habitat)
 
 # add species_habitat to groundbeetles_community
-groundbeetle_community <- groundbeetle_community %>%
+groundbeetle_total <- groundbeetle_community %>%
   left_join(groundbeetle_habitat, by = "id")
 
 
 # check whether there are columns without data, only NA
 # 4 columns are empty (lifespan, voltinism, and their units)
 # measurementValue_Voltinism_mean" "measurementValue_Lifespan""measurementUnit_Voltinism_mean"measurementUnit_Lifespan" 
-na_columns <- names(groundbeetle_community)[colSums(is.na(groundbeetle_community)) == nrow(groundbeetle_community)]
+na_columns <- names(groundbeetle_total)[colSums(is.na(groundbeetle_total)) == nrow(groundbeetle_total)]
 
 # remove empty columns
-groundbeetle_community <- groundbeetle_community %>% select(-one_of(na_columns))
-print(groundbeetle_community) # 40 columns
+groundbeetle_total <- groundbeetle_total %>% select(-one_of(na_columns))
+print(groundbeetle_total) # 40 columns
+view(groundbeetle_total)
 ```
 
-# calculating community thermal preferences
+# calculating community thermal index
 ```{r}
-glimpse(groundbeetle_community)
-view(groundbeetle_community)
+# making a dataset containing thermal preferences (piping groundbeetle_total)
+groundbeetle_thermal <- groundbeetle_total %>% select(Staalnummer, Ophaaldatum, scientificName, Aantal, measurementValue_Thermal_minimum, measurementValue_Thermal_maximum, measurementValue_Thermal_mean, measurementValue_Thermal_range)
+print(groundbeetle_thermal)
 
+# calculate the weighted mean of the mean temperature of the community (based on the abundance!)
+# calculate Community Temperature Index per sample number/location/pitfall
+cti_per_pitfall <- groundbeetle_thermal %>%
+  group_by(Staalnummer) %>%  # sort by pitfall
+  summarise(CTI = sum(Aantal * measurementValue_Thermal_mean) / sum(Aantal))  # weighted mean temperature
+
+# view results
+view(cti_per_pitfall)
 ```
 
