@@ -7,9 +7,8 @@ output: html_document
 
 ## Load required packages
 
-### With the library googlesheets4, Rstudio has access to the dataset
-
 ```{r packages, include=FALSE}
+## With the library googlesheets4, Rstudio has access to the dataset
 library(lubridate)
 library(dplyr)
 library(tidyverse)
@@ -165,7 +164,7 @@ view(groundbeetle_community)
 ```
 
 
-# Edit species habitat
+# Edit species habitat, add data to groundbeetle main dataset
 ```{r}
 # remove rows with description value 0
 species_habitat <- species_habitat %>%
@@ -173,20 +172,46 @@ species_habitat <- species_habitat %>%
 
 # remove language column
 species_habitat$language <- NULL
-view(species_habitat)
+#view(species_habitat)
 
-# remove id's that are not present in the groundbeeltes_community
-species_habitat_filtered <- species_habitat %>%
+# remove id's that are not present in the groundbeeltes_community, left only with captured groundbeetles
+groundbeetle_habitat <- species_habitat %>%
   semi_join(groundbeetle_community, by = "id")
-glimpse(species_habitat)
+glimpse(groundbeetle_habitat)
 
-species_habitat_breed <- species_habitat %>%
-  filter(description != "0") %>%           # Eerst: verwijder "0"-waardes
+# first, remove all 0 values, make new columns for each type with its corresponding description
+groundbeetle_habitat <- groundbeetle_habitat %>%
+  filter(description != "0") %>%           
   pivot_wider(
-    names_from = type,                     # Maak van de 'type'-waarden kolomnamen
-    values_from = description,             # Vul de kolommen met 'description'
-    values_fn = list(description = ~ first(.))  # In geval van meerdere, neem de eerste
+    names_from = type,                     
+    values_from = description,             
   )
+
+# remove columns concerning larvae, our main dataset is about adults only
+groundbeetle_habitat <- groundbeetle_habitat %>% select(-Trophic_range_larva, -Feeding_guild_larva,-Overwintering_larva)
+
+view(groundbeetle_habitat)
+#glimpse(groundbeetle_habitat)
+
+# add species_habitat to groundbeetles_community
+groundbeetle_community <- groundbeetle_community %>%
+  left_join(groundbeetle_habitat, by = "id")
+
+
+# check whether there are columns without data, only NA
+# 4 columns are empty (lifespan, voltinism, and their units)
+# measurementValue_Voltinism_mean" "measurementValue_Lifespan""measurementUnit_Voltinism_mean"measurementUnit_Lifespan" 
+na_columns <- names(groundbeetle_community)[colSums(is.na(groundbeetle_community)) == nrow(groundbeetle_community)]
+
+# remove empty columns
+groundbeetle_community <- groundbeetle_community %>% select(-one_of(na_columns))
+print(groundbeetle_community) # 40 columns
+```
+
+# calculating community thermal preferences
+```{r}
+glimpse(groundbeetle_community)
+view(groundbeetle_community)
 
 ```
 
