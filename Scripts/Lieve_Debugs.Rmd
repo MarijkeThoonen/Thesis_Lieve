@@ -225,3 +225,26 @@ cti_per_pitfall <- groundbeetle_thermal %>%
 view(cti_per_pitfall)
 ```
 
+# constructing Non-linair MultiDimensional Scaling
+```{r}
+# package needed for multivariate analysis
+library(vegan)
+data_nmds <- groundbeetle_total
+
+# making of abundance matrix: rows = pitfull number, columns = species
+abundance_matrix <- data_nmds %>%
+  group_by(Staalnummer, scientificName) %>%
+  summarise(totaal = sum(Aantal), .groups = "drop") %>%
+  pivot_wider(names_from = scientificName, values_from = totaal, values_fill = 0)
+
+# Remove sample number, needs to be label
+abundance_matrix <- abundance_matrix %>%
+  column_to_rownames("Staalnummer")  
+
+nmds_result <- metaMDS(abundance_matrix, distance = "bray", k = 2, trymax = 100)
+# Simpele plot
+plot(nmds_result, type = "t")
+
+# stress nearly 0? insufficient data?
+```
+
